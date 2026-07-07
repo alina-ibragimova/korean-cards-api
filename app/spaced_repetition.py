@@ -23,7 +23,7 @@ def calculate_sm2(repetitions: int, ease_factor: float, interval: int, quality: 
         new_interval = 1
         new_repetitions = 0
     new_ease_factor = ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
-    new_ease_factor = max(1.3, round(new_ease_factor, 2))  # не может быть меньше 1.3
+    new_ease_factor = max(1.3, round(new_ease_factor, 2))  
 
     next_review = datetime.now(timezone.utc) + timedelta(days=new_interval)
 

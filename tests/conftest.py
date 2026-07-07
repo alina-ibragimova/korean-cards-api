@@ -31,7 +31,6 @@ def client():
         c.headers.clear()
     app.dependency_overrides.clear()
 
-#  РАЗОБРАТЬ
 
 @pytest.fixture
 def auth_client(client):
