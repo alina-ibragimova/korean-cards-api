@@ -19,7 +19,7 @@
 - **Pydantic** — валидация данных
 - **JWT** — авторизация
 - **Docker + docker-compose** — запуск
-
+- **pytest** — тестирование
 
 <p align="center">
   <img src="screenshots/image1.png" width="1000">
