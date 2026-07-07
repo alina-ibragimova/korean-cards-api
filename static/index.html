@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Korean Cards</title>
+  <style>
+    /* ─── Tokens ─── */
+    :root {
+      --navy:   #1a237e;
+      --red:    #e53935;
+      --bg:     #f8f9fb;
+      --surface:#ffffff;
+      --border: #e5e7eb;
+      --muted:  #6b7280;
+      --green:  #16a34a;
+      --yellow: #ca8a04;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: #111827;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ─── Utilities ─── */
+    .hidden { display: none !important; }
+
+    /* ─── Auth ─── */
+    .auth-wrap {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 1rem;
+    }
+    .auth-box {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 2rem;
+      width: 100%; max-width: 360px;
+    }
+    .auth-logo { text-align: center; margin-bottom: 1.5rem; }
+    .auth-logo h1 { font-size: 1.5rem; color: var(--navy); }
+    .auth-logo p  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    .tab-row {
+      display: flex; border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; margin-bottom: 1.25rem;
+    }
+    .tab-btn {
+      flex: 1; padding: 0.5rem; border: none; background: none;
+      cursor: pointer; font-size: 0.85rem; color: var(--muted);
+    }
+    .tab-btn.active { background: var(--navy); color: #fff; font-weight: 500; }
+
+    label { display: block; font-size: 0.75rem; font-weight: 500; color: #374151; margin-bottom: 3px; }
+    input, textarea {
+      width: 100%; padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 0.875rem; margin-bottom: 0.75rem;
+      font-family: inherit; outline: none; background: var(--surface);
+    }
+    input:focus, textarea:focus { border-color: var(--navy); }
+    textarea { resize: none; }
+
+    .err { font-size: 0.8rem; color: var(--red); margin-bottom: 0.5rem; display: none; }
+
+    .btn {
+      padding: 0.6rem 1rem; border: none; border-radius: 6px;
+      cursor: pointer; font-size: 0.875rem; font-weight: 500;
+      transition: filter .15s;
+    }
+    .btn:hover { filter: brightness(0.92); }
+    .btn-primary { background: var(--navy); color: #fff; width: 100%; }
+    .btn-red     { background: var(--red); color: #fff; padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+    .btn-ghost   { background: #f3f4f6; color: #374151; }
+
+    /* ─── App shell ─── */
+    nav {
+      background: var(--navy); color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.25rem; height: 52px; gap: 0.5rem;
+    }
+    .nav-title { font-weight: 600; font-size: 1rem; white-space: nowrap; }
+    .nav-tabs  { display: flex; gap: 4px; }
+    .nav-tab {
+      border: none; background: none; color: rgba(255,255,255,.65);
+      padding: 0.35rem 0.75rem; border-radius: 6px;
+      cursor: pointer; font-size: 0.8rem; white-space: nowrap;
+    }
+    .nav-tab:hover  { background: rgba(255,255,255,.1); }
+    .nav-tab.active { background: rgba(255,255,255,.2); color: #fff; font-weight: 500; }
+    .btn-logout {
+      border: 1px solid rgba(255,255,255,.35); background: none;
+      color: rgba(255,255,255,.8); padding: 0.3rem 0.7rem;
+      border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.1); }
+
+    /* ─── Stats bar ─── */
+    .stats {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; gap: 0; overflow-x: auto;
+    }
+    .stat {
+      flex: 1; text-align: center; padding: 0.65rem 0.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-val   { font-size: 1.2rem; font-weight: 700; color: var(--navy); }
+    .stat-label { font-size: 0.7rem; color: var(--muted); }
+
+    /* ─── Main content ─── */
+    main { max-width: 640px; margin: 1.5rem auto; padding: 0 1rem 4rem; }
+
+    /* ─── Review ─── */
+    .progress { text-align: center; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem; }
+
+    .flip-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      min-height: 200px;
+      display: flex; flex-direction: column; justify-content: center; gap: 0.5rem;
+    }
+    .flip-word { font-size: 2.75rem; font-weight: 700; color: var(--navy); letter-spacing: -1px; }
+    .flip-tr   { font-size: 1.2rem; color: #374151; }
+    .flip-ex   { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+
+    .btn-reveal {
+      display: block; width: 100%; padding: 0.7rem;
+      background: #f3f4f6; border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; font-size: 0.875rem;
+      color: #374151; margin-bottom: 1rem;
+    }
+    .btn-reveal:hover { background: #e5e7eb; }
+
+    .quality-label { text-align: center; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .quality-row { display: flex; gap: 0.5rem; justify-content: center; }
+    .q-btn {
+      width: 46px; height: 46px; border: none; border-radius: 8px;
+      cursor: pointer; font-size: 1rem; font-weight: 700;
+      transition: transform .1s;
+    }
+    .q-btn:hover { transform: scale(1.12); }
+    .q-bad  { background: #fee2e2; color: var(--red);   }
+    .q-mid  { background: #fef9c3; color: var(--yellow);}
+    .q-good { background: #dcfce7; color: var(--green); }
+    .quality-hint { text-align: center; font-size: 0.7rem; color: var(--muted); margin-top: 0.4rem; }
+
+    /* ─── Empty state ─── */
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty h3 { color: #374151; margin-bottom: 0.25rem; }
+
+    /* ─── Cards list ─── */
+    .card-row {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem; margin-bottom: 0.5rem;
+    }
+    .card-word { font-size: 1.15rem; font-weight: 600; color: var(--navy); }
+    .card-tr   { font-size: 0.85rem; color: var(--muted); }
+    .card-meta { font-size: 0.72rem; color: var(--muted); text-align: right; white-space: nowrap; }
+
+    /* ─── Add form ─── */
+    .form-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .form-box h2 { font-size: 1rem; margin-bottom: 1.25rem; color: var(--navy); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ AUTH ═══════════════ -->
+<div id="auth-section" class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>🇰🇷 Korean Cards</h1>
+      <p>시작이 반이다 — Начало это половина дела</p>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="setAuthMode('login')">Войти</button>
+      <button class="tab-btn"        onclick="setAuthMode('register')">Регистрация</button>
+    </div>
+    <div id="auth-err" class="err"></div>
+    <label>Email</label>
+    <input id="auth-email" type="email" placeholder="you@example.com" />
+    <label>Пароль</label>
+    <input id="auth-pw" type="password" placeholder="Минимум 6 символов"
+           onkeydown="if(event.key==='Enter') doAuth()" />
+    <button class="btn btn-primary" id="auth-submit" onclick="doAuth()">Войти</button>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app-section" class="hidden">
+  <nav>
+    <span class="nav-title">🇰🇷 Korean Cards</span>
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-review" onclick="switchView('review')">Повторение</button>
+      <button class="nav-tab"        id="tab-cards"  onclick="switchView('cards')">Карточки</button>
+      <button class="nav-tab"        id="tab-add"    onclick="switchView('add')">+ Добавить</button>
+    </div>
+    <button class="btn-logout" onclick="logout()">Выйти</button>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-label">всего</div></div>
+    <div class="stat"><div class="stat-val" id="s-due">—</div><div class="stat-label">сегодня</div></div>
+    <div class="stat"><div class="stat-val" id="s-learned">—</div><div class="stat-label">выучено</div></div>
+    <div class="stat"><div class="stat-val" id="s-new">—</div><div class="stat-label">новых</div></div>
+  </div>
+
+  <main>
+
+    <!-- REVIEW -->
+    <div id="view-review">
+      <div id="rv-empty" class="empty hidden">
+        <div class="empty-icon">🎉</div>
+        <h3>Всё повторено!</h3>
+        <p>На сегодня больше нет карточек.</p>
+      </div>
+      <div id="rv-content" class="hidden">
+        <div class="progress" id="rv-progress"></div>
+        <div class="flip-card">
+          <div class="flip-word" id="rv-word"></div>
+          <div id="rv-answer" class="hidden">
+            <div class="flip-tr" id="rv-tr"></div>
+            <div class="flip-ex" id="rv-ex"></div>
+          </div>
+        </div>
+        <div id="rv-reveal">
+          <button class="btn-reveal" onclick="reveal()">Показать перевод</button>
+        </div>
+        <div id="rv-quality" class="hidden">
+          <div class="quality-label">Насколько хорошо вспомнил?</div>
+          <div class="quality-row">
+            <button class="q-btn q-bad"  onclick="rate(0)">0</button>
+            <button class="q-btn q-bad"  onclick="rate(1)">1</button>
+            <button class="q-btn q-mid"  onclick="rate(2)">2</button>
+            <button class="q-btn q-mid"  onclick="rate(3)">3</button>
+            <button class="q-btn q-good" onclick="rate(4)">4</button>
+            <button class="q-btn q-good" onclick="rate(5)">5</button>
+          </div>
+          <div class="quality-hint">0–2 не вспомнил · 3 с трудом · 4–5 хорошо</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS -->
+    <div id="view-cards" class="hidden">
+      <div id="cl-empty" class="empty hidden">
+        <div class="empty-icon">📚</div>
+        <h3>Карточек пока нет</h3>
+        <p>Добавь первую!</p>
+      </div>
+      <div id="cards-list"></div>
+    </div>
+
+    <!-- ADD -->
+    <div id="view-add" class="hidden">
+      <div class="form-box">
+        <h2>Новая карточка</h2>
+        <div id="add-err" class="err"></div>
+        <label>Корейское слово *</label>
+        <input id="f-word"  placeholder="안녕" />
+        <label>Перевод *</label>
+        <input id="f-tr"    placeholder="привет" />
+        <label>Пример</label>
+        <textarea id="f-ex" rows="2" placeholder="안녕하세요!"></textarea>
+        <button class="btn btn-primary" onclick="createCard()">Добавить карточку</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  let token = localStorage.getItem('kc_token');
+  let authMode = 'login';
+  let dueCards = [];
+  let idx = 0;
+
+  // ─── AUTH ───────────────────────────────────────
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (mode === 'login') === (i === 0));
+    });
+    document.getElementById('auth-submit').textContent =
+      mode === 'login' ? 'Войти' : 'Зарегистрироваться';
+    showErr('auth-err', '');
+  }
+
+  async function doAuth() {
+    const email = document.getElementById('auth-email').value.trim();
+    const pw    = document.getElementById('auth-pw').value;
+    if (!email || !pw) { showErr('auth-err', 'Заполни все поля'); return; }
+
+    if (authMode === 'register') {
+      const r = await fetch(`${API}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pw }),
+      });
+      if (!r.ok) { showErr('auth-err', (await r.json()).detail || 'Ошибка'); return; }
+    }
+
+    const form = new FormData();
+    form.append('username', email);
+    form.append('password', pw);
+    const r = await fetch(`${API}/auth/login`, { method: 'POST', body: form });
+    if (!r.ok) { showErr('auth-err', 'Неверный email или пароль'); return; }
+    token = (await r.json()).access_token;
+    localStorage.setItem('kc_token', token);
+    boot();
+  }
+
+  function logout() {
+    token = null;
+    localStorage.removeItem('kc_token');
+    show('auth-section'); hide('app-section');
+  }
+
+  // ─── API ────────────────────────────────────────
+
+  async function req(method, path, body) {
+    const r = await fetch(`${API}${path}`, {
+      method,
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (r.status === 401) { logout(); return null; }
+    if (r.status === 204) return {};
+    return r.json();
+  }
+
+  // ─── BOOT ───────────────────────────────────────
+
+  async function boot() {
+    hide('auth-section'); show('app-section');
+    await loadStats();
+    await switchView('review');
+  }
+
+  async function loadStats() {
+    const d = await req('GET', '/cards/stats');
+    if (!d) return;
+    document.getElementById('s-total').textContent   = d.total_cards;
+    document.getElementById('s-due').textContent     = d.due_today;
+    document.getElementById('s-learned').textContent = d.learned;
+    document.getElementById('s-new').textContent     = d.new_cards;
+  }
+
+  // ─── VIEWS ──────────────────────────────────────
+
+  async function switchView(v) {
+    ['review', 'cards', 'add'].forEach(name => {
+      document.getElementById(`view-${name}`).classList.toggle('hidden', name !== v);
+      document.getElementById(`tab-${name}`).classList.toggle('active', name === v);
+    });
+    if (v === 'review') await loadReview();
+    if (v === 'cards')  await loadCards();
+  }
+
+  // ─── REVIEW ─────────────────────────────────────
+
+  async function loadReview() {
+    dueCards = await req('GET', '/cards/due') || [];
+    idx = 0;
+    renderCard();
+  }
+
+  function renderCard() {
+    if (!dueCards.length || idx >= dueCards.length) {
+      show('rv-empty'); hide('rv-content');
+      loadStats();
+      return;
+    }
+    hide('rv-empty'); show('rv-content');
+    const c = dueCards[idx];
+    document.getElementById('rv-progress').textContent = `${idx + 1} / ${dueCards.length}`;
+    document.getElementById('rv-word').textContent = c.word;
+    document.getElementById('rv-tr').textContent   = c.translation;
+    document.getElementById('rv-ex').textContent   = c.example || '';
+    hide('rv-answer'); hide('rv-quality');
+    show('rv-reveal');
+  }
+
+  function reveal() {
+    show('rv-answer'); show('rv-quality'); hide('rv-reveal');
+  }
+
+  async function rate(q) {
+    await req('POST', `/cards/${dueCards[idx].id}/review`, { quality: q });
+    idx++;
+    renderCard();
+  }
+
+  // ─── CARDS LIST ─────────────────────────────────
+
+  async function loadCards() {
+    const cards = await req('GET', '/cards/') || [];
+    const list  = document.getElementById('cards-list');
+    if (!cards.length) { show('cl-empty'); list.innerHTML = ''; return; }
+    hide('cl-empty');
+    list.innerHTML = cards.map(c => `
+      <div class="card-row">
+        <div>
+          <div class="card-word">${esc(c.word)}</div>
+          <div class="card-tr">${esc(c.translation)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <div class="card-meta">интервал: ${c.interval}д<br>повторений: ${c.repetitions}</div>
+          <button class="btn btn-red" onclick="deleteCard(${c.id})">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function deleteCard(id) {
+    if (!confirm('Удалить карточку?')) return;
+    await req('DELETE', `/cards/${id}`);
+    loadCards();
+    loadStats();
+  }
+
+  // ─── ADD CARD ───────────────────────────────────
+
+  async function createCard() {
+    const word = document.getElementById('f-word').value.trim();
+    const tr   = document.getElementById('f-tr').value.trim();
+    const ex   = document.getElementById('f-ex').value.trim();
+    if (!word || !tr) { showErr('add-err', 'Слово и перевод обязательны'); return; }
+    showErr('add-err', '');
+    const res = await req('POST', '/cards/', { word, translation: tr, example: ex || null });
+    if (!res) return;
+    ['f-word','f-tr','f-ex'].forEach(id => document.getElementById(id).value = '');
+    await loadStats();
+    switchView('cards');
+  }
+
+  // ─── HELPERS ────────────────────────────────────
+
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id).classList.add('hidden'); }
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ─── INIT ───────────────────────────────────────
+  if (token) boot();
+</script>
+</body>
+</html>
